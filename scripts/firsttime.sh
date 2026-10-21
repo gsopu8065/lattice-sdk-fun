@@ -14,13 +14,23 @@ fi
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 CLONED_PROJECT_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
+if [ "$CLONED_PROJECT_DIR" = "$PROJECT_DIR" ]; then
+  printf '%s\n' "Running from the installed project; updating it without cloning again."
+  exec "$PROJECT_DIR/scripts/update.sh"
+fi
+
 if [ "$CLONED_PROJECT_DIR" != "$SOURCE_DIR" ]; then
-  printf 'Expected the clone at %s, but found it at %s.\n' "$SOURCE_DIR" "$CLONED_PROJECT_DIR" >&2
+  printf 'Run this script from the clone at %s or installed project at %s; found it at %s.\n' \
+    "$SOURCE_DIR" "$PROJECT_DIR" "$CLONED_PROJECT_DIR" >&2
   exit 1
 fi
 
 if [ -e "$PROJECT_DIR" ]; then
-  printf '%s already exists; refusing to replace it.\n' "$PROJECT_DIR" >&2
+  if [ -x "$PROJECT_DIR/scripts/update.sh" ]; then
+    printf '%s already exists; updating the installed project instead of moving it again.\n' "$PROJECT_DIR"
+    exec "$PROJECT_DIR/scripts/update.sh"
+  fi
+  printf '%s already exists and does not contain the updater; refusing to replace it.\n' "$PROJECT_DIR" >&2
   exit 1
 fi
 

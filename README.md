@@ -12,7 +12,7 @@ cd /home/srujanjs/Documents/code/lattice-sdk-fun
 ./scripts/firsttime.sh
 ```
 
-The script installs system packages, moves the project to `/opt/raspberry-pi-motion-capture`, builds and tests it, then installs and starts the systemd service. It creates `.env` from `.env.example` if needed. It must be run as `srujanjs`; it refuses to replace an existing `/opt/raspberry-pi-motion-capture` directory.
+The script installs system packages, moves the project to `/opt/raspberry-pi-motion-capture`, builds and tests it, then installs and starts the systemd service. It creates `.env` from `.env.example` if needed. It must be run as `srujanjs`. If `/opt/raspberry-pi-motion-capture` already exists, it runs that installation's updater rather than moving or replacing it. You can also run `/opt/raspberry-pi-motion-capture/scripts/firsttime.sh` directly for later updates; no new clone is needed.
 
 After setup, edit the installed app's environment file:
 
