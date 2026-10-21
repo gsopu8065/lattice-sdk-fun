@@ -108,9 +108,11 @@ test("keeps only the newest videos and removes sync markers with old clips", asy
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), "motion-capture-"));
   try {
     const filePaths = [];
-    for (const name of ["oldest.h264", "middle.h264", "newest.h264"]) {
+    for (const [index, name] of ["oldest.h264", "middle.h264", "newest.h264"].entries()) {
       const filePath = path.join(directory, name);
       await fs.writeFile(filePath, name);
+      const modifiedAt = new Date(Date.UTC(2020, 0, index + 1));
+      await fs.utimes(filePath, modifiedAt, modifiedAt);
       filePaths.push(filePath);
     }
     await markSynced(filePaths[0]);
