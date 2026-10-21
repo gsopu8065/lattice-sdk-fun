@@ -1,0 +1,18 @@
+[Unit]
+Description=Raspberry Pi motion capture and Lattice sync
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=srujanjs
+Group=srujanjs
+WorkingDirectory=/opt/raspberry-pi-motion-capture
+ExecStart=/usr/bin/node /opt/raspberry-pi-motion-capture/src/index.js
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target
