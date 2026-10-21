@@ -4,14 +4,15 @@ Watches a Raspberry Pi CSI camera, saves a 30-second video when it detects motio
 
 ## Install on the Pi
 
+Clone the project into the setup script's expected location, then run it:
+
 ```sh
-sudo apt update
-sudo apt install -y nodejs npm python3-picamera2 python3-numpy
-cd /opt/raspberry-pi-motion-capture
-npm ci
-cp .env.example .env
-nano .env
+git clone git@github.com:gsopu8065/lattice-sdk-fun.git /home/srujanjs/Documents/code/lattice-sdk-fun
+cd /home/srujanjs/Documents/code/lattice-sdk-fun
+./scripts/firsttime.sh
 ```
+
+The script installs system packages, moves the project to `/opt/raspberry-pi-motion-capture`, builds and tests it, then installs and starts the systemd service. It creates `.env` from `.env.example` if needed. It must be run as `srujanjs`; it refuses to replace an existing `/opt/raspberry-pi-motion-capture` directory.
 
 `.env` uses the same three Lattice settings as the Lattice gRPC learning project:
 
@@ -29,7 +30,10 @@ Your camera location is already set to `47.79260824681428, -122.27106065201278`.
 
 ## Run
 
+To run manually instead of using the service:
+
 ```sh
+cd /opt/raspberry-pi-motion-capture
 npm run build
 npm start
 ```
@@ -40,19 +44,19 @@ Stop with `Ctrl+C`. Videos are H.264 files. To see logs while running as a servi
 sudo journalctl -u raspberry-pi-motion-capture -f
 ```
 
-## Run on startup (optional)
-
-The included systemd service is configured for your Pi username `srujanjs` and assumes the project is installed at `/opt/raspberry-pi-motion-capture`. Update the paths in `deploy/raspberry-pi-motion-capture.service` if needed, then run:
-
-```sh
-sudo chown -R srujanjs:srujanjs /opt/raspberry-pi-motion-capture
-sudo install -m 0644 deploy/raspberry-pi-motion-capture.service /etc/systemd/system/raspberry-pi-motion-capture.service
-sudo systemctl daemon-reload
-sudo systemctl enable --now raspberry-pi-motion-capture
-```
-
 When you change `.env`, restart the service to load the new values:
 
 ```sh
 sudo systemctl restart raspberry-pi-motion-capture
 ```
+
+## Update after a Git push
+
+After committing and pushing changes from your development computer, update the Pi with:
+
+```sh
+cd /opt/raspberry-pi-motion-capture
+./scripts/update.sh
+```
+
+The script pulls the latest fast-forwardable commit, installs Node dependencies, runs the build checks and tests, then restarts the service. It does not change the Pi's ignored `.env` file. If the build or tests fail, it stops before restarting the service.
