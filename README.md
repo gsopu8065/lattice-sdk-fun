@@ -14,6 +14,18 @@ cd /home/srujanjs/Documents/code/lattice-sdk-fun
 
 The script installs system packages, moves the project to `/opt/raspberry-pi-motion-capture`, builds and tests it, then installs and starts the systemd service. It creates `.env` from `.env.example` if needed. It must be run as `srujanjs`; it refuses to replace an existing `/opt/raspberry-pi-motion-capture` directory.
 
+After setup, edit the installed app's environment file:
+
+```sh
+nano /opt/raspberry-pi-motion-capture/.env
+```
+
+Set `LATTICE_ENDPOINT` and `ENVIRONMENT_TOKEN` to enable Lattice sync. Set `SANDBOXES_TOKEN` only when using a sandbox. Save in nano with **Ctrl+O**, **Enter**, then **Ctrl+X**. Restart the service so it loads the new values:
+
+```sh
+sudo systemctl restart raspberry-pi-motion-capture
+```
+
 `.env` uses the same three Lattice settings as the Lattice gRPC learning project:
 
 ```dotenv
