@@ -104,9 +104,12 @@ def main():
             if previous_frame is not None:
                 fraction = changed_fraction(gray, previous_frame, args.pixel_threshold)
                 if now - last_diagnostic >= 5:
+                    seconds_until_idle_clip = max(0.0, next_idle_recording - now)
                     print(
                         f"Motion check: {fraction:.3%} of pixels changed "
-                        f"(trigger: {args.motion_threshold:.3%}).",
+                        f"(trigger: {args.motion_threshold:.3%}). "
+                        f"Recording: {recording}. "
+                        f"Next fallback clip in {seconds_until_idle_clip:.0f}s unless motion starts one first.",
                         flush=True,
                     )
                     last_diagnostic = now

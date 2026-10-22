@@ -1,0 +1,17 @@
+[Unit]
+Description=MediaMTX media server (Raspberry Pi camera live feed)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=srujanjs
+Group=srujanjs
+SupplementaryGroups=video render
+WorkingDirectory=/opt/mediamtx
+ExecStart=/opt/mediamtx/mediamtx /opt/mediamtx/mediamtx.yml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

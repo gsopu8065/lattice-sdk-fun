@@ -64,6 +64,28 @@ When you change `.env`, restart the service to load the new values:
 sudo systemctl restart raspberry-pi-motion-capture
 ```
 
+## Live video streaming (MediaMTX)
+
+In addition to motion-triggered clips, the camera can be relayed to Lattice as a live SRT feed. This uses [MediaMTX](https://github.com/bluenviron/mediamtx) to read the Pi camera and serve it locally, plus a small relay process that pushes that feed on to Lattice.
+
+Only one process can read the Pi camera at a time, so install MediaMTX with:
+
+```sh
+cd /opt/raspberry-pi-motion-capture
+./scripts/install-mediamtx.sh
+```
+
+This script stops and disables `raspberry-pi-motion-capture` (freeing the camera), installs MediaMTX and `ffmpeg`, and starts two services:
+
+- `mediamtx` — reads the Pi camera directly and serves it locally at `rtsp://<pi-ip>:8554/raspberry-pi-motion-live` (verify with `ffplay`).
+- `raspberry-pi-live-stream` — pulls that local feed and relays it to a Lattice SRT ingress stream, publishing a live entity for it. Only runs when `LATTICE_ENDPOINT`/`ENVIRONMENT_TOKEN` are set in `.env`.
+
+Logs: `sudo journalctl -u mediamtx -f` and `sudo journalctl -u raspberry-pi-live-stream -f`.
+
+To go back to motion-triggered clip recording instead of the live feed: `sudo systemctl disable --now mediamtx raspberry-pi-live-stream && sudo systemctl enable --now raspberry-pi-motion-capture`.
+
+Optional `.env` settings: `LIVE_STREAM_SOURCE_URL` (default `rtsp://127.0.0.1:8554/raspberry-pi-motion-live`) and `LIVE_STREAM_REFRESH_INTERVAL` (seconds between re-publishing the live entity, default 300).
+
 ## Update after a Git push
 
 After committing and pushing changes from your development computer, update the Pi with:

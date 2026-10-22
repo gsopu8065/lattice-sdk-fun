@@ -19,6 +19,11 @@ function main() {
     return;
   }
 
+  console.log(
+    `Config: clipSeconds=${config.clipSeconds} noMotionInterval=${config.noMotionInterval} ` +
+      `motionThreshold=${config.motionThreshold} pixelThreshold=${config.pixelThreshold} maxVideos=${config.maxVideos}`,
+  );
+
   const uploadClip = config.latticeEnabled ? createLatticeUploader(config) : null;
   if (!uploadClip) {
     console.log("Lattice credentials are not configured; clips will be stored locally.");
@@ -56,6 +61,13 @@ function main() {
       do {
         syncRequested = false;
         const videos = await listVideos(config.outputDirectory);
+        const unsynced = [];
+        for (const video of videos) {
+          if (!(await isSynced(video.filePath))) {
+            unsynced.push(video.filePath);
+          }
+        }
+        console.log(`Local videos: ${videos.length} total, ${unsynced.length} not yet synced.`);
         for (const { filePath } of videos) {
           if (inFlight.has(filePath) || await isSynced(filePath)) {
             continue;

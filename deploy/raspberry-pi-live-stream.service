@@ -1,0 +1,19 @@
+[Unit]
+Description=Raspberry Pi live video relay to Lattice (via MediaMTX)
+After=network-online.target mediamtx.service
+Wants=network-online.target
+Requires=mediamtx.service
+
+[Service]
+Type=simple
+User=srujanjs
+Group=srujanjs
+WorkingDirectory=/opt/raspberry-pi-motion-capture
+ExecStart=/usr/bin/node /opt/raspberry-pi-motion-capture/src/livestream.js
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

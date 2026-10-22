@@ -1,0 +1,16 @@
+# Minimal MediaMTX config for this project. Any setting not listed here keeps
+# MediaMTX's built-in default (see https://github.com/bluenviron/mediamtx/blob/main/mediamtx.yml).
+#
+# Reads the Raspberry Pi camera directly (via libcamera) and serves it locally
+# over RTSP/HLS/WebRTC/SRT at the path below for local verification, e.g.:
+#   ffplay rtsp://<pi-ip>:8554/raspberry-pi-motion-live
+#
+# raspberry-pi-motion-capture.service is stopped/disabled while MediaMTX owns
+# the camera; only one process can read it at a time.
+paths:
+  raspberry-pi-motion-live:
+    source: rpiCamera
+    rpiCameraWidth: 1280
+    rpiCameraHeight: 720
+    rpiCameraFPS: 15
+    rpiCameraBitrate: 1000000

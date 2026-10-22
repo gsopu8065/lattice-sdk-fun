@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "build": "npm run check",
-    "check": "node --check src/index.js && node --check src/config.js && node --check src/lattice.js && node --check src/storage.js && python3 -m py_compile camera/motion_capture.py"
+    "check": "node --check src/index.js && node --check src/livestream.js && node --check src/config.js && node --check src/lattice.js && node --check src/storage.js && python3 -m py_compile camera/motion_capture.py"
   },
   "engines": {
     "node": ">=18"

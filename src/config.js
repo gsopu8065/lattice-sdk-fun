@@ -27,6 +27,7 @@ function loadConfig(env = process.env, cwd = process.cwd()) {
   const environmentToken = env.ENVIRONMENT_TOKEN;
   const sandboxToken = env.SANDBOXES_TOKEN;
   const cameraName = env.CAMERA_NAME || "Raspberry Pi Camera";
+  const liveStreamSourceUrl = env.LIVE_STREAM_SOURCE_URL || "rtsp://127.0.0.1:8554/raspberry-pi-motion-live";
 
   if (!outputDirectory.trim()) {
     throw new Error("VIDEO_DIR must not be empty.");
@@ -37,6 +38,9 @@ function loadConfig(env = process.env, cwd = process.cwd()) {
   if (!cameraName.trim()) {
     throw new Error("CAMERA_NAME must not be empty.");
   }
+  if (!liveStreamSourceUrl.trim()) {
+    throw new Error("LIVE_STREAM_SOURCE_URL must not be empty.");
+  }
   return {
     outputDirectory: path.resolve(cwd, outputDirectory),
     python,
@@ -46,6 +50,12 @@ function loadConfig(env = process.env, cwd = process.cwd()) {
     latticeEnabled: Boolean(latticeEndpoint?.trim() && environmentToken?.trim()),
     latticeCredentialsIncomplete: Boolean(latticeEndpoint?.trim()) !== Boolean(environmentToken?.trim()),
     cameraName: cameraName.trim(),
+    liveStreamSourceUrl: liveStreamSourceUrl.trim(),
+    liveStreamRefreshInterval: readNumber(env, "LIVE_STREAM_REFRESH_INTERVAL", 300, {
+      integer: true,
+      min: 10,
+      max: 3600,
+    }),
     cameraLatitude: readNumber(env, "CAMERA_LATITUDE", 47.79260824681428, {
       min: -90,
       max: 90,
