@@ -16,6 +16,7 @@ test("uses defaults and resolves the video directory", () => {
   assert.equal(config.cameraLongitude, -122.27106065201278);
   assert.equal(config.maxVideos, 20);
   assert.equal(config.clipSeconds, 30);
+  assert.equal(config.noMotionInterval, 3600);
   assert.equal(config.motionThreshold, 0.04);
   assert.equal(config.pixelThreshold, 25);
   assert.equal(config.fps, 15);
@@ -33,6 +34,7 @@ test("accepts supported environment overrides", () => {
       CAMERA_LONGITUDE: "-122.5",
       MAX_VIDEOS: "12",
       CLIP_SECONDS: "45",
+      NO_MOTION_INTERVAL: "7200",
       MOTION_THRESHOLD: "0.08",
       PIXEL_THRESHOLD: "30",
       CAMERA_FPS: "20",
@@ -50,6 +52,7 @@ test("accepts supported environment overrides", () => {
   assert.equal(config.cameraLongitude, -122.5);
   assert.equal(config.maxVideos, 12);
   assert.equal(config.clipSeconds, 45);
+  assert.equal(config.noMotionInterval, 7200);
   assert.equal(config.motionThreshold, 0.08);
   assert.equal(config.pixelThreshold, 30);
   assert.equal(config.fps, 20);
@@ -57,6 +60,7 @@ test("accepts supported environment overrides", () => {
 
 test("rejects invalid values instead of silently falling back", () => {
   assert.throws(() => loadConfig({ CLIP_SECONDS: "0" }), /CLIP_SECONDS/);
+  assert.throws(() => loadConfig({ NO_MOTION_INTERVAL: "0" }), /NO_MOTION_INTERVAL/);
   assert.throws(
     () => loadConfig({ MOTION_THRESHOLD: "not-a-number" }),
     /MOTION_THRESHOLD/,

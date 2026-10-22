@@ -16,6 +16,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--clip-seconds", required=True, type=int)
+    parser.add_argument("--no-motion-interval", required=True, type=int)
     parser.add_argument("--motion-threshold", required=True, type=float)
     parser.add_argument("--pixel-threshold", required=True, type=int)
     parser.add_argument("--fps", required=True, type=int)
@@ -51,9 +52,42 @@ def main():
     previous_frame = None
     consecutive_motion_frames = 0
     clip_deadline = 0.0
+    next_idle_recording = time.monotonic() + args.no_motion_interval
+    last_diagnostic = 0.0
+    output_path = None
+    recording_reason = ""
+
+    def start_recording(reason, now):
+        nonlocal recording, clip_deadline, next_idle_recording, output_path, recording_reason
+        prefix = "motion" if reason == "motion" else "idle"
+        filename = datetime.now().strftime(f"{prefix}-%Y%m%d-%H%M%S-%f.h264")
+        output_path = args.output_dir / filename
+        camera.start_recording(
+            H264Encoder(bitrate=4_000_000),
+            FileOutput(str(output_path)),
+        )
+        recording = True
+        recording_reason = reason
+        clip_deadline = now + args.clip_seconds
+        if reason == "motion":
+            next_idle_recording = now + args.no_motion_interval
+            print(f"Motion detected; recording {output_path}", flush=True)
+        else:
+            next_idle_recording = now + args.no_motion_interval
+            print(
+                f"No motion detected for {args.no_motion_interval} seconds; "
+                f"recording fallback clip {output_path}",
+                flush=True,
+            )
 
     try:
-        print("Camera ready; warming up for two seconds.", flush=True)
+        print(
+            "Camera ready; warming up for two seconds. "
+            f"Motion threshold: {args.motion_threshold:.3%}; "
+            f"pixel threshold: {args.pixel_threshold}. "
+            f"Fallback clip interval: {args.no_motion_interval} seconds.",
+            flush=True,
+        )
         time.sleep(2)
 
         while running:
@@ -64,27 +98,30 @@ def main():
             if recording and now >= clip_deadline:
                 camera.stop_recording()
                 recording = False
-                print(f"Saved {args.clip_seconds}-second motion clip.", flush=True)
+                print(f"Saved {args.clip_seconds}-second {recording_reason} clip.", flush=True)
                 print(f"CLIP_SAVED\t{output_path}", flush=True)
 
-            if previous_frame is not None and not recording:
+            if previous_frame is not None:
                 fraction = changed_fraction(gray, previous_frame, args.pixel_threshold)
-                if fraction >= args.motion_threshold:
+                if now - last_diagnostic >= 5:
+                    print(
+                        f"Motion check: {fraction:.3%} of pixels changed "
+                        f"(trigger: {args.motion_threshold:.3%}).",
+                        flush=True,
+                    )
+                    last_diagnostic = now
+
+                if not recording and fraction >= args.motion_threshold:
                     consecutive_motion_frames += 1
-                else:
+                elif not recording:
                     consecutive_motion_frames = 0
 
-                if consecutive_motion_frames >= 2:
-                    filename = datetime.now().strftime("motion-%Y%m%d-%H%M%S-%f.h264")
-                    output_path = args.output_dir / filename
-                    camera.start_recording(
-                        H264Encoder(bitrate=4_000_000),
-                        FileOutput(str(output_path)),
-                    )
-                    recording = True
-                    clip_deadline = time.monotonic() + args.clip_seconds
+                if not recording and consecutive_motion_frames >= 2:
+                    start_recording("motion", now)
                     consecutive_motion_frames = 0
-                    print(f"Motion detected; recording {output_path}", flush=True)
+
+            if not recording and now >= next_idle_recording:
+                start_recording("idle", now)
 
             previous_frame = gray
     finally:

@@ -99,6 +99,8 @@ function main() {
     config.outputDirectory,
     "--clip-seconds",
     String(config.clipSeconds),
+    "--no-motion-interval",
+    String(config.noMotionInterval),
     "--motion-threshold",
     String(config.motionThreshold),
     "--pixel-threshold",
