@@ -64,7 +64,7 @@ function loadConfig(env = process.env, cwd = process.cwd()) {
       min: 1,
       max: 3600,
     }),
-    noMotionInterval: readNumber(env, "NO_MOTION_INTERVAL", 3600, {
+    noMotionInterval: readNumber(env, "NO_MOTION_INTERVAL", 300, {
       integer: true,
       min: 1,
       max: 86400,

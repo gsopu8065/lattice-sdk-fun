@@ -1,6 +1,6 @@
 # Raspberry Pi Motion Capture
 
-Watches a Raspberry Pi CSI camera, saves a 30-second video when it detects motion, and optionally uploads the clip to Lattice as a video attached to a track. If no motion is detected for an hour, it saves a 30-second fallback clip; fallback recording repeats hourly until motion is detected.
+Watches a Raspberry Pi CSI camera, saves a 30-second video when it detects motion, and optionally uploads the clip to Lattice as a video attached to a track. If no motion is detected for 5 minutes, it saves a 30-second fallback clip; fallback recording repeats every 5 minutes until motion is detected.
 
 ## Install on the Pi
 
@@ -40,7 +40,7 @@ If those values are blank, the app still monitors the camera and stores clips lo
 
 Your camera location is already set to `47.79260824681428, -122.27106065201278`. Edit `CAMERA_LATITUDE` and `CAMERA_LONGITUDE` in `.env` only if you want to change it.
 
-Optional settings can also be added to `.env`: `NO_MOTION_INTERVAL=3600` sets the fallback interval in seconds (one hour by default), and `MOTION_THRESHOLD=0.005` / `PIXEL_THRESHOLD=10` make motion detection more sensitive. Restart the service after changing settings.
+Optional settings can also be added to `.env`: `NO_MOTION_INTERVAL=300` sets the fallback interval in seconds (five minutes by default), and `MOTION_THRESHOLD=0.005` / `PIXEL_THRESHOLD=10` make motion detection more sensitive. Restart the service after changing settings.
 
 ## Run
 

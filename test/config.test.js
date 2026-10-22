@@ -16,7 +16,7 @@ test("uses defaults and resolves the video directory", () => {
   assert.equal(config.cameraLongitude, -122.27106065201278);
   assert.equal(config.maxVideos, 20);
   assert.equal(config.clipSeconds, 30);
-  assert.equal(config.noMotionInterval, 3600);
+  assert.equal(config.noMotionInterval, 300);
   assert.equal(config.motionThreshold, 0.04);
   assert.equal(config.pixelThreshold, 25);
   assert.equal(config.fps, 15);

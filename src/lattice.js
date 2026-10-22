@@ -46,6 +46,14 @@ function trackIdForClip(filePath) {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-5${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
 }
 
+function isObjectAlreadyExistsError(error) {
+  return (
+    error?.statusCode === 400 &&
+    typeof error.body?.message === "string" &&
+    error.body.message.includes("already exists")
+  );
+}
+
 function createLatticeUploader(config) {
   const clientOptions = {
     baseUrl: config.latticeEndpoint,
@@ -64,7 +72,13 @@ function createLatticeUploader(config) {
     const capturedAt = new Date();
     const objectPath = `raspberry-pi-motion/${path.basename(filePath)}`;
 
-    await client.objects.uploadObject(createReadStream(filePath), objectPath);
+    try {
+      await client.objects.uploadObject(createReadStream(filePath), objectPath);
+    } catch (error) {
+      if (!isObjectAlreadyExistsError(error)) {
+        throw error;
+      }
+    }
     await client.entities.publishEntity(createTrackEntity(filePath, config, capturedAt, entityId));
     return { entityId, objectPath };
   };
