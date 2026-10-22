@@ -115,17 +115,14 @@ function createLiveStreamEntity(config, srt, entityId, capturedAt) {
       specificType: "Raspberry Pi camera live video feed",
       template: "TEMPLATE_TRACK",
     },
-    media: srt?.url
-      ? {
-          media: [
-            {
-              itemIdentifier: entityId,
-              type: "MEDIA_TYPE_VIDEO",
-              relativePath: srt.url,
-            },
-          ],
-        }
-      : undefined,
+    media: {
+      media: [
+        {
+          itemIdentifier: LIVESTREAM_INGRESS_ID,
+          type: "MEDIA_TYPE_VIDEO",
+        },
+      ],
+    },
     provenance: {
       integrationName: "Raspberry Pi Motion Capture",
       dataType: "CAMERA_LIVE_VIDEO",
