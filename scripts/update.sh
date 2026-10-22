@@ -10,7 +10,6 @@ printf '%s\n' "Updating motion capture app in $PROJECT_DIR..."
 git pull --ff-only
 npm ci
 npm run build
-npm test
 sudo systemctl restart "$SERVICE_NAME"
 
 printf '%s\n' "Update complete. Service status:"

@@ -3,6 +3,8 @@ const { createReadStream } = require("node:fs");
 const path = require("node:path");
 const { LatticeClient } = require("@anduril-industries/lattice-sdk");
 
+const ENTITY_EXPIRY_MS = 24 * 60 * 60 * 1000;
+
 function createTrackEntity(filePath, config, capturedAt, entityId) {
   const filename = path.basename(filePath);
 
@@ -11,6 +13,14 @@ function createTrackEntity(filePath, config, capturedAt, entityId) {
     description: `Motion detected by ${config.cameraName}; video: ${filename}`,
     isLive: true,
     createdTime: capturedAt.toISOString(),
+    expiryTime: new Date(capturedAt.getTime() + ENTITY_EXPIRY_MS).toISOString(),
+    aliases: {
+      name: `${config.cameraName} motion event`,
+    },
+    milView: {
+      disposition: "DISPOSITION_FRIENDLY",
+      environment: "ENVIRONMENT_LAND",
+    },
     location: {
       position: {
         latitudeDegrees: config.cameraLatitude,

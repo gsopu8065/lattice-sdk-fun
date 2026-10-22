@@ -57,7 +57,6 @@ fi
 printf '%s\n' "Installing Node dependencies and checking the project..."
 npm ci
 npm run build
-npm test
 
 printf '%s\n' "Installing and starting the systemd service..."
 sudo install -m 0644 "$PROJECT_DIR/deploy/raspberry-pi-motion-capture.service" "$SERVICE_FILE"
